@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 from dasha_engine import (
     get_julian_day_local,
@@ -19,6 +20,13 @@ app = FastAPI(
     description="MVP astrology calculation API for Dasha, Lagna, Graha positions, and chart mapping."
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all for MVP
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class BirthInput(BaseModel):
     dob: str
