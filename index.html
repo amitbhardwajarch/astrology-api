@@ -276,12 +276,11 @@
       const state = stateEl.value.trim();
       const city = cityEl.value.trim();
 
-      if (!name || !day || !month || !year || !hour || !minute || !country || !state || !city) {
+      if (!day || !month || !year || !hour || !minute || !country || !state || !city) {
         throw new Error("Please enter date, month, year, time, country, state, and city.");
       }
 
       return {
-        name,
         day: day.padStart(2, "0"),
         month: month.padStart(2, "0"),
         year,
