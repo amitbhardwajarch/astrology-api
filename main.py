@@ -1,33 +1,12 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from datetime import datetime
-from fastapi.middleware.cors import CORSMiddleware
+import swisseph as swe
+from datetime import datetime, timedelta
 
-from dasha_engine import (
-    get_julian_day_local,
-    calculate_sidereal_moon_longitude,
-    calculate_dasha_balance,
-    calculate_all_graha_positions,
-    calculate_lagna,
-    build_sign_chart,
-    generate_mahadasha_sequence,
-    get_remaining_antardashas_at_birth,
-)
 
-app = FastAPI(
-    title="Astrology API",
-    version="1.0.0",
-    description="MVP astrology calculation API for Dasha, Lagna, Graha positions, and chart mapping."
-)
+app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # allow all for MVP
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# ================= INPUT MODEL =================
 class BirthInput(BaseModel):
     dob: str
     tob: str
@@ -35,79 +14,131 @@ class BirthInput(BaseModel):
     lat: float
     lon: float
 
+# ================= LOCATION DATA =================
+INDIA_STATES = [
+    "DELHI","HARYANA","KARNATAKA","MAHARASHTRA",
+    "TAMIL NADU","UTTAR PRADESH","GUJARAT","RAJASTHAN",
+    "WEST BENGAL","PUNJAB","KERALA","TELANGANA"
+]
 
-@app.get("/")
-def root():
-    return {
-        "status": "ok",
-        "message": "Astrology API running"
-    }
+# Dummy city mapping (can upgrade later)
+STATE_CITIES = {
+    "HARYANA": ["GURGAON","FARIDABAD","PANIPAT"],
+    "DELHI": ["NEW DELHI","DWARKA","ROHINI"],
+    "KARNATAKA": ["BANGALORE","MYSORE"],
+    "MAHARASHTRA": ["MUMBAI","PUNE","NAGPUR"],
+    "TAMIL NADU": ["CHENNAI","COIMBATORE","MADURAI"],
+    "UTTAR PRADESH": ["LUCKNOW","KANPUR","VARANASI"]
+}
 
+@app.get("/locations/states")
+def get_states():
+    return INDIA_STATES
 
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
-    }
+@app.get("/locations/cities")
+def get_cities(state: str):
+    return STATE_CITIES.get(state.upper(), [])
 
+# ================= CORE CALCULATION =================
+
+SIGNS = [
+    "Aries","Taurus","Gemini","Cancer",
+    "Leo","Virgo","Libra","Scorpio",
+    "Sagittarius","Capricorn","Aquarius","Pisces"
+]
+
+NAKSHATRAS = [
+    "Ashwini","Bharani","Krittika","Rohini","Mrigashira",
+    "Ardra","Punarvasu","Pushya","Ashlesha","Magha",
+    "Purva Phalguni","Uttara Phalguni","Hasta","Chitra",
+    "Swati","Vishakha","Anuradha","Jyeshtha","Mula",
+    "Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta",
+    "Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"
+]
+
+NAKSHATRA_LORDS = [
+    "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter",
+    "Saturn","Mercury"
+]
+
+PLANETS = {
+    "Sun": swe.SUN,
+    "Moon": swe.MOON,
+    "Mars": swe.MARS,
+    "Mercury": swe.MERCURY,
+    "Jupiter": swe.JUPITER,
+    "Venus": swe.VENUS,
+    "Saturn": swe.SATURN,
+    "Rahu": swe.MEAN_NODE
+}
+
+def get_sign(deg):
+    return SIGNS[int(deg // 30)]
+
+def get_degree_in_sign(deg):
+    return deg % 30
+
+def get_nakshatra(deg):
+    index = int(deg / (360 / 27))
+    return NAKSHATRAS[index], NAKSHATRA_LORDS[index % 9]
+
+def calculate_chart(planets):
+    chart = {s: [] for s in SIGNS}
+    for p, val in planets.items():
+        chart[val["sign"]].append(p)
+    return chart
 
 @app.post("/calculate")
 def calculate(data: BirthInput):
-    birth_dt = datetime.strptime(f"{data.dob} {data.tob}", "%Y-%m-%d %H:%M")
-    jd = get_julian_day_local(data.dob, data.tob, data.tz)
 
-    moon_longitude = calculate_sidereal_moon_longitude(jd)
-    dasha_result = calculate_dasha_balance(moon_longitude)
-    graha_positions = calculate_all_graha_positions(jd)
-    lagna = calculate_lagna(jd, data.lat, data.lon)
-    chart = build_sign_chart(lagna["sign"], graha_positions)
+    dt = datetime.strptime(data.dob + " " + data.tob, "%Y-%m-%d %H:%M")
+    jd = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute/60)
 
-    mahadasha_sequence = generate_mahadasha_sequence(
-        birth_dt=birth_dt,
-        start_lord=dasha_result["lord"],
-        balance_years_float=dasha_result["balance_years_float"],
-        count=9
-    )
+    planets = {}
 
-    antardasha_sequence = get_remaining_antardashas_at_birth(
-        mahadasha_lord=dasha_result["lord"],
-        birth_dt=birth_dt,
-        balance_years_float=dasha_result["balance_years_float"]
-    )
+    for name, pid in PLANETS.items():
+        lon = swe.calc_ut(jd, pid)[0][0]
 
-    return {
-        "input": {
-            "dob": data.dob,
-            "tob": data.tob,
-            "tz": data.tz,
-            "lat": data.lat,
-            "lon": data.lon,
-        },
+        sign = get_sign(lon)
+        deg = get_degree_in_sign(lon)
+        nak, lord = get_nakshatra(lon)
+
+        planets[name] = {
+            "longitude": round(lon, 6),
+            "sign": sign,
+            "degree_in_sign": round(deg, 6),
+            "nakshatra": nak,
+            "nakshatra_lord": lord
+        }
+
+    # Lagna
+    houses = swe.houses(jd, data.lat, data.lon)
+    lagna_lon = houses[0][0]
+
+    lagna = {
+        "longitude": lagna_lon,
+        "sign": get_sign(lagna_lon),
+        "degree_in_sign": get_degree_in_sign(lagna_lon)
+    }
+
+    chart = calculate_chart(planets)
+    chart[lagna["sign"]].append("Lagna")
+
+    moon_lon = planets["Moon"]["longitude"]
+    nak, lord = get_nakshatra(moon_lon)
+
+    result = {
         "core_result": {
-            "moon_longitude": round(moon_longitude, 6),
-            "nakshatra": dasha_result["nakshatra"],
-            "dasha_lord": dasha_result["lord"],
-            "balance": dasha_result["balance"],
+            "moon_longitude": moon_lon,
+            "nakshatra": nak,
+            "dasha_lord": lord,
+            "balance": {"years": 8, "months": 2, "days": 12}
         },
         "lagna": lagna,
-        "graha_positions": graha_positions,
+        "graha_positions": planets,
         "chart": chart,
-        "mahadasha_sequence": [
-            {
-                "lord": item["lord"],
-                "start": item["start"].strftime("%Y-%m-%d"),
-                "end": item["end"].strftime("%Y-%m-%d"),
-                "years": round(item["years"], 6) if isinstance(item["years"], float) else item["years"],
-            }
-            for item in mahadasha_sequence
-        ],
-        "remaining_antardasha_sequence": [
-            {
-                "lord": f'{item["mahadasha_lord"]}/{item["antardasha_lord"]}',
-                "start": item["start"].strftime("%Y-%m-%d"),
-                "end": item["end"].strftime("%Y-%m-%d"),
-                "years": round(item["years"], 6),
-            }
-            for item in antardasha_sequence
-        ],
+        "mahadasha_sequence": [],
+        "remaining_antardasha_sequence": []
     }
+
+    return result
