@@ -1,12 +1,21 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import swisseph as swe
-from datetime import datetime, timedelta
-
+from datetime import datetime
 
 app = FastAPI()
 
-# ================= INPUT MODEL =================
+# CORS FIX
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ================= INPUT =================
 class BirthInput(BaseModel):
     dob: str
     tob: str
@@ -14,14 +23,13 @@ class BirthInput(BaseModel):
     lat: float
     lon: float
 
-# ================= LOCATION DATA =================
+# ================= STATES =================
 INDIA_STATES = [
     "DELHI","HARYANA","KARNATAKA","MAHARASHTRA",
     "TAMIL NADU","UTTAR PRADESH","GUJARAT","RAJASTHAN",
     "WEST BENGAL","PUNJAB","KERALA","TELANGANA"
 ]
 
-# Dummy city mapping (can upgrade later)
 STATE_CITIES = {
     "HARYANA": ["GURGAON","FARIDABAD","PANIPAT"],
     "DELHI": ["NEW DELHI","DWARKA","ROHINI"],
@@ -39,7 +47,7 @@ def get_states():
 def get_cities(state: str):
     return STATE_CITIES.get(state.upper(), [])
 
-# ================= CORE CALCULATION =================
+# ================= CALCULATION =================
 
 SIGNS = [
     "Aries","Taurus","Gemini","Cancer",
@@ -56,10 +64,7 @@ NAKSHATRAS = [
     "Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"
 ]
 
-NAKSHATRA_LORDS = [
-    "Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter",
-    "Saturn","Mercury"
-]
+NAKSHATRA_LORDS = ["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"]
 
 PLANETS = {
     "Sun": swe.SUN,
@@ -75,18 +80,12 @@ PLANETS = {
 def get_sign(deg):
     return SIGNS[int(deg // 30)]
 
-def get_degree_in_sign(deg):
+def get_degree(deg):
     return deg % 30
 
-def get_nakshatra(deg):
-    index = int(deg / (360 / 27))
-    return NAKSHATRAS[index], NAKSHATRA_LORDS[index % 9]
-
-def calculate_chart(planets):
-    chart = {s: [] for s in SIGNS}
-    for p, val in planets.items():
-        chart[val["sign"]].append(p)
-    return chart
+def get_nak(deg):
+    i = int(deg / (360/27))
+    return NAKSHATRAS[i], NAKSHATRA_LORDS[i % 9]
 
 @app.post("/calculate")
 def calculate(data: BirthInput):
@@ -98,47 +97,35 @@ def calculate(data: BirthInput):
 
     for name, pid in PLANETS.items():
         lon = swe.calc_ut(jd, pid)[0][0]
-
-        sign = get_sign(lon)
-        deg = get_degree_in_sign(lon)
-        nak, lord = get_nakshatra(lon)
+        nak, lord = get_nak(lon)
 
         planets[name] = {
-            "longitude": round(lon, 6),
-            "sign": sign,
-            "degree_in_sign": round(deg, 6),
+            "sign": get_sign(lon),
             "nakshatra": nak,
             "nakshatra_lord": lord
         }
 
-    # Lagna
     houses = swe.houses(jd, data.lat, data.lon)
     lagna_lon = houses[0][0]
 
     lagna = {
-        "longitude": lagna_lon,
-        "sign": get_sign(lagna_lon),
-        "degree_in_sign": get_degree_in_sign(lagna_lon)
+        "sign": get_sign(lagna_lon)
     }
 
-    chart = calculate_chart(planets)
-    chart[lagna["sign"]].append("Lagna")
+    chart = {s: [] for s in SIGNS}
 
-    moon_lon = planets["Moon"]["longitude"]
-    nak, lord = get_nakshatra(moon_lon)
+    for p in planets:
+        chart[planets[p]["sign"]].append(p)
 
-    result = {
+    chart[lagna["sign"]].append("LAGNA")
+
+    return {
         "core_result": {
-            "moon_longitude": moon_lon,
-            "nakshatra": nak,
-            "dasha_lord": lord,
+            "nakshatra": planets["Moon"]["nakshatra"],
+            "dasha_lord": planets["Moon"]["nakshatra_lord"],
             "balance": {"years": 8, "months": 2, "days": 12}
         },
         "lagna": lagna,
         "graha_positions": planets,
-        "chart": chart,
-        "mahadasha_sequence": [],
-        "remaining_antardasha_sequence": []
+        "chart": chart
     }
-
-    return result
