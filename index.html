@@ -41,6 +41,7 @@
       padding: 4px 8px;
       font-size: 14px;
       text-transform: uppercase;
+      background: #fff;
     }
 
     .input-row button {
@@ -153,7 +154,7 @@
       <select id="country"></select>
       <select id="state"></select>
       <select id="city"></select>
-      <button id="showBtn">SHOW</button>
+      <button id="showBtn" type="button">SHOW</button>
     </div>
 
     <div class="main">
@@ -193,7 +194,7 @@
     const showBtn = document.getElementById("showBtn");
     const errorBox = document.getElementById("errorBox");
 
-    // Client-required South Indian zodiac layout:
+    // Required South Indian zodiac layout:
     // Top row: 12 | 1 | 2 | 3
     // Left side: 11, 10
     // Right side: 4, 5
@@ -248,7 +249,28 @@
       });
     }
 
-    stateEl.addEventListener("change", () => fillCities(stateEl.value));
+    function initializeDefaults() {
+      fillCountries();
+      fillStates();
+
+      // Auto-select first actual state
+      if (stateEl.options.length > 1) {
+        stateEl.selectedIndex = 1;
+        fillCities(stateEl.value);
+
+        // Auto-select first actual city
+        if (cityEl.options.length > 1) {
+          cityEl.selectedIndex = 1;
+        }
+      }
+    }
+
+    stateEl.addEventListener("change", () => {
+      fillCities(stateEl.value);
+      if (cityEl.options.length > 1) {
+        cityEl.selectedIndex = 1;
+      }
+    });
 
     async function getLocation(city, state, country) {
       const q = `${city}, ${state}, ${country}`;
@@ -415,8 +437,7 @@
 
     showBtn.addEventListener("click", calculate);
 
-    fillCountries();
-    fillStates();
+    initializeDefaults();
   </script>
 </body>
 </html>
