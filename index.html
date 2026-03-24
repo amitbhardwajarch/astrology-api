@@ -13,7 +13,7 @@
     }
 
     .page {
-      width: 1180px;
+      width: 1220px;
       margin: 12px auto;
       background: #fff;
       border: 2px solid #111;
@@ -28,7 +28,7 @@
 
     .input-row {
       display: grid;
-      grid-template-columns: 180px 70px 70px 90px 70px 70px 130px 180px 180px 90px;
+      grid-template-columns: 70px 70px 90px 70px 70px 120px 180px 180px 90px;
       gap: 6px;
       margin-bottom: 18px;
     }
@@ -51,16 +51,15 @@
 
     .main {
       display: grid;
-      grid-template-columns: 540px 1fr;
-      gap: 20px;
+      grid-template-columns: 700px 1fr;
+      gap: 18px;
       align-items: start;
     }
 
     .south-chart-wrap {
       border: 2px solid #111;
-      padding: 0;
-      width: 540px;
-      height: 540px;
+      width: 700px;
+      height: 700px;
       background: #fff;
     }
 
@@ -75,25 +74,30 @@
     .chart-cell {
       border: 1px solid #111;
       padding: 6px;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.25;
       position: relative;
       white-space: pre-line;
       overflow: hidden;
     }
 
+    .chart-cell.empty {
+      background: #fff;
+    }
+
     .chart-sign {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
-      color: #444;
+      color: #111;
       position: absolute;
       top: 4px;
-      right: 6px;
+      left: 6px;
     }
 
     .chart-text {
-      margin-top: 18px;
+      margin-top: 30px;
       font-weight: 700;
+      font-size: 14px;
     }
 
     .planet-box {
@@ -109,8 +113,8 @@
 
     th, td {
       border: 1px solid #111;
-      padding: 7px 8px;
-      font-size: 13px;
+      padding: 8px 8px;
+      font-size: 14px;
       text-align: left;
       vertical-align: top;
     }
@@ -124,9 +128,9 @@
       border: 2px solid #111;
       margin-top: 14px;
       padding: 10px 12px;
-      font-size: 15px;
-      line-height: 1.7;
-      min-height: 70px;
+      font-size: 16px;
+      line-height: 1.8;
+      min-height: 74px;
     }
 
     .error {
@@ -141,7 +145,6 @@
     <div class="title">ASTROGURUJI</div>
 
     <div class="input-row">
-      <input id="name" placeholder="Name" />
       <input id="day" placeholder="DD" maxlength="2" />
       <input id="month" placeholder="MM" maxlength="2" />
       <input id="year" placeholder="YYYY" maxlength="4" />
@@ -164,9 +167,9 @@
             <tr>
               <th style="width: 22%;">Planet</th>
               <th style="width: 18%;">Sign</th>
-              <th style="width: 22%;">Degree</th>
-              <th style="width: 22%;">Nakshatra</th>
-              <th style="width: 16%;">Lord</th>
+              <th style="width: 18%;">Degree</th>
+              <th style="width: 24%;">Nakshatra</th>
+              <th style="width: 18%;">Lord</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -175,8 +178,8 @@
     </div>
 
     <div class="footer-box" id="dashaBox">
-      bal. of dasa:<br>
-      present dasa running:
+      <div><b>bal. of dasa:</b></div>
+      <div><b>present dasa running:</b></div>
     </div>
 
     <div id="errorBox" class="error"></div>
@@ -190,12 +193,32 @@
     const showBtn = document.getElementById("showBtn");
     const errorBox = document.getElementById("errorBox");
 
+    // Client-required South Indian zodiac layout:
+    // Top row: 12 | 1 | 2 | 3
+    // Left side: 11, 10
+    // Right side: 4, 5
+    // Bottom row: 9 | 8 | 7 | 6
     const chartLayout = [
-      "Aries", "Taurus", "Gemini", "Cancer",
-      "Pisces", null, null, "Leo",
-      "Aquarius", null, null, "Virgo",
-      "Capricorn", "Sagittarius", "Scorpio", "Libra"
+      "Pisces", "Aries", "Taurus", "Gemini",
+      "Aquarius", null, null, "Cancer",
+      "Capricorn", null, null, "Leo",
+      "Sagittarius", "Scorpio", "Libra", "Virgo"
     ];
+
+    const signNumbers = {
+      "Aries": 1,
+      "Taurus": 2,
+      "Gemini": 3,
+      "Cancer": 4,
+      "Leo": 5,
+      "Virgo": 6,
+      "Libra": 7,
+      "Scorpio": 8,
+      "Sagittarius": 9,
+      "Capricorn": 10,
+      "Aquarius": 11,
+      "Pisces": 12
+    };
 
     function fillCountries() {
       countryEl.innerHTML = "";
@@ -232,9 +255,11 @@
       const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
       const res = await fetch(url, { headers: { "Accept": "application/json" } });
       const data = await res.json();
+
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error("Could not resolve latitude and longitude for selected city.");
       }
+
       return {
         lat: parseFloat(data[0].lat),
         lon: parseFloat(data[0].lon)
@@ -242,7 +267,6 @@
     }
 
     function validateInput() {
-      const name = document.getElementById("name").value.trim();
       const day = document.getElementById("day").value.trim();
       const month = document.getElementById("month").value.trim();
       const year = document.getElementById("year").value.trim();
@@ -253,7 +277,7 @@
       const city = cityEl.value.trim();
 
       if (!name || !day || !month || !year || !hour || !minute || !country || !state || !city) {
-        throw new Error("Please enter name, date, month, year, time, country, state, and city.");
+        throw new Error("Please enter date, month, year, time, country, state, and city.");
       }
 
       return {
@@ -281,7 +305,10 @@
         lord: "-"
       });
 
-      const order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      const order = [
+        "Sun", "Moon", "Mars", "Mercury",
+        "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"
+      ];
 
       order.forEach((p) => {
         const g = data.graha_positions[p];
@@ -307,7 +334,7 @@
 
     function renderSouthChart(data) {
       const container = document.getElementById("rasiChart");
-      const chartData = data.rasi_chart;   // critical fix: use rasi_chart, not chart
+      const chartData = data.rasi_chart;
 
       container.innerHTML = "";
 
@@ -316,14 +343,14 @@
         cell.className = "chart-cell";
 
         if (!sign) {
-          cell.style.background = "#fff";
+          cell.classList.add("empty");
           container.appendChild(cell);
           return;
         }
 
         const signLabel = document.createElement("div");
         signLabel.className = "chart-sign";
-        signLabel.textContent = sign;
+        signLabel.textContent = `${signNumbers[sign]}. ${sign}`;
 
         const text = document.createElement("div");
         text.className = "chart-text";
@@ -361,7 +388,6 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: input.name,
             dob,
             tob,
             tz: 5.5,

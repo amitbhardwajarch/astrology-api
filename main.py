@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -28,7 +29,6 @@ app.add_middleware(
 
 
 class BirthInput(BaseModel):
-    name: str = ""
     dob: str
     tob: str
     tz: float
@@ -77,7 +77,6 @@ def calculate(data: BirthInput):
 
     return {
         "input": {
-            "name": data.name,
             "dob": data.dob,
             "tob": data.tob,
             "tz": data.tz,
