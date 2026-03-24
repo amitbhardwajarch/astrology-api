@@ -5,285 +5,209 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASTROGURUJI</title>
   <style>
-    :root {
-      --border: #222;
-      --bg: #efefef;
-      --panel: #ffffff;
-      --accent: #d8b400;
-    }
-    * { box-sizing: border-box; }
     body {
       margin: 0;
+      background: #efefef;
       font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: #111;
+      text-transform: uppercase;
     }
+
     .page {
-      width: min(1380px, calc(100vw - 16px));
-      margin: 8px auto;
-      background: var(--panel);
-      border: 2px solid var(--border);
-      padding: 12px;
+      width: 1180px;
+      margin: 12px auto;
+      background: #fff;
+      border: 2px solid #111;
+      padding: 10px;
     }
+
     .title {
-      text-align: center;
-      border: 2px solid var(--border);
-      padding: 8px 12px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
     }
-    .title h1 {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: 1px;
-    }
-    .title div {
-      font-size: 14px;
-      margin-top: 2px;
-    }
-    .form-grid {
+
+    .input-row {
       display: grid;
-      grid-template-columns: 1.25fr repeat(6, .7fr) .9fr 1fr 1fr;
+      grid-template-columns: 180px 70px 70px 90px 70px 70px 130px 180px 180px 90px;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 18px;
     }
-    .form-grid input,
-    .form-grid select,
-    .form-grid button {
-      height: 36px;
-      border: 1px solid var(--border);
-      padding: 6px 8px;
+
+    .input-row input,
+    .input-row select,
+    .input-row button {
+      height: 32px;
+      border: 1px solid #111;
+      padding: 4px 8px;
       font-size: 14px;
+      text-transform: uppercase;
     }
-    .form-grid button {
-      background: #f2d233;
+
+    .input-row button {
+      background: #f1cf3a;
       font-weight: 700;
       cursor: pointer;
     }
-    .band {
-      border: 1px solid var(--border);
-      padding: 6px 8px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: #f8f8f8;
-    }
-    .summary-grid {
+
+    .main {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .box {
-      border: 1px solid var(--border);
-      min-height: 90px;
-      padding: 8px;
-    }
-    .box h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      border-bottom: 1px solid #bbb;
-      padding-bottom: 4px;
-    }
-    .kv {
-      display: grid;
-      grid-template-columns: 135px 1fr;
-      gap: 4px 8px;
-      font-size: 14px;
-      line-height: 1.35;
-    }
-    .two-col {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 8px;
+      grid-template-columns: 540px 1fr;
+      gap: 20px;
       align-items: start;
-      margin-bottom: 8px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
+
+    .south-chart-wrap {
+      border: 2px solid #111;
+      padding: 0;
+      width: 540px;
+      height: 540px;
+      background: #fff;
     }
-    th, td {
-      border: 1px solid var(--border);
-      padding: 6px 7px;
-      text-align: left;
-      vertical-align: top;
-    }
-    th { background: #f3f3f3; }
-    .charts-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .chart-panel {
-      border: 1px solid var(--border);
-      padding: 8px;
-    }
-    .chart-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-align: center;
-    }
+
     .south-chart {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 92px);
-      border: 1px solid var(--border);
+      grid-template-rows: repeat(4, 1fr);
+      width: 100%;
+      height: 100%;
     }
-    .cell {
-      border: 1px solid var(--border);
+
+    .chart-cell {
+      border: 1px solid #111;
       padding: 6px;
       font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 92px;
+      line-height: 1.25;
+      position: relative;
+      white-space: pre-line;
+      overflow: hidden;
     }
-    .label {
+
+    .chart-sign {
       font-size: 11px;
       font-weight: 700;
       color: #444;
+      position: absolute;
+      top: 4px;
+      right: 6px;
     }
-    .occupants {
+
+    .chart-text {
+      margin-top: 18px;
       font-weight: 700;
-      line-height: 1.25;
-      white-space: pre-line;
     }
-    .empty { background: #fff; }
-    .footer-note {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #444;
+
+    .planet-box {
+      border: 2px solid #111;
+      padding: 0;
     }
-    .hidden { display: none; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th, td {
+      border: 1px solid #111;
+      padding: 7px 8px;
+      font-size: 13px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f3f3;
+      font-weight: 700;
+    }
+
+    .footer-box {
+      border: 2px solid #111;
+      margin-top: 14px;
+      padding: 10px 12px;
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 70px;
+    }
+
     .error {
-      margin-top: 8px;
+      margin-top: 10px;
       color: #b00020;
       font-weight: 700;
-    }
-    @media (max-width: 1100px) {
-      .form-grid { grid-template-columns: repeat(2, 1fr); }
-      .summary-grid, .two-col, .charts-wrap { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="title">
-      <h1>ASTROGURUJI</h1>
-      <div>INSTANT HOROSCOPE DISPLAY - SINGLE PAGE</div>
-    </div>
+    <div class="title">ASTROGURUJI</div>
 
-    <div class="form-grid">
+    <div class="input-row">
       <input id="name" placeholder="Name" />
       <input id="day" placeholder="DD" maxlength="2" />
       <input id="month" placeholder="MM" maxlength="2" />
       <input id="year" placeholder="YYYY" maxlength="4" />
       <input id="hour" placeholder="HH" maxlength="2" />
       <input id="minute" placeholder="MM" maxlength="2" />
-      <input id="timezone" value="5.5" placeholder="TZ" />
       <select id="country"></select>
       <select id="state"></select>
       <select id="city"></select>
       <button id="showBtn">SHOW</button>
     </div>
 
-    <div class="band">HOROSCOPE SUMMARY</div>
-
-    <div id="report" class="hidden">
-      <div class="summary-grid">
-        <div class="box">
-          <h3>Birth Details</h3>
-          <div class="kv" id="birthDetails"></div>
-        </div>
-        <div class="box">
-          <h3>Moon & Dasha</h3>
-          <div class="kv" id="dashaSummary"></div>
-        </div>
-        <div class="box">
-          <h3>Lagna</h3>
-          <div class="kv" id="lagnaSummary"></div>
-        </div>
+    <div class="main">
+      <div class="south-chart-wrap">
+        <div class="south-chart" id="rasiChart"></div>
       </div>
 
-      <div class="two-col">
-        <div class="box">
-          <h3>Nine Planets Position</h3>
-          <table id="planetTable">
-            <thead>
-              <tr>
-                <th>Planet</th>
-                <th>Sign</th>
-                <th>Degree</th>
-                <th>Nakshatra</th>
-                <th>Nakshatra Lord</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="box">
-          <h3>Dasha Details</h3>
-          <table id="dashaTable">
-            <thead>
-              <tr>
-                <th>Lord</th>
-                <th>Start</th>
-                <th>End</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      <div class="planet-box">
+        <table id="planetTable">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Planet</th>
+              <th style="width: 18%;">Sign</th>
+              <th style="width: 22%;">Degree</th>
+              <th style="width: 22%;">Nakshatra</th>
+              <th style="width: 16%;">Lord</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
+    </div>
 
-      <div class="charts-wrap">
-        <div class="chart-panel">
-          <div class="chart-title">Rasi Chart</div>
-          <div class="south-chart" id="rasiChart"></div>
-        </div>
-        <div class="chart-panel">
-          <div class="chart-title">Navamsa Chart</div>
-          <div class="south-chart" id="navamsaChart"></div>
-        </div>
-      </div>
-
-      <div class="footer-note">
-        All horoscope details appear together on one page after entering name, date, month, year, time, country, state, and city.
-      </div>
+    <div class="footer-box" id="dashaBox">
+      bal. of dasa:<br>
+      present dasa running:
     </div>
 
     <div id="errorBox" class="error"></div>
   </div>
 
-  <script src="./india_locations.js"></script>
+  <script src="/india_locations.js"></script>
   <script>
-    const API = window.ASTRO_API_BASE || "https://astrology-api-ng94.onrender.com";
     const countryEl = document.getElementById("country");
     const stateEl = document.getElementById("state");
     const cityEl = document.getElementById("city");
-    const reportEl = document.getElementById("report");
+    const showBtn = document.getElementById("showBtn");
     const errorBox = document.getElementById("errorBox");
 
-    const chartSequence = [
+    const chartLayout = [
       "Aries", "Taurus", "Gemini", "Cancer",
       "Pisces", null, null, "Leo",
       "Aquarius", null, null, "Virgo",
       "Capricorn", "Sagittarius", "Scorpio", "Libra"
     ];
 
-    function pad2(v) {
-      return String(v).padStart(2, "0");
-    }
-
     function fillCountries() {
-      countryEl.innerHTML = "<option value='India'>India</option>";
+      countryEl.innerHTML = "";
+      const opt = document.createElement("option");
+      opt.value = "India";
+      opt.textContent = "India";
+      countryEl.appendChild(opt);
     }
 
     function fillStates() {
-      const states = Object.keys(INDIA_LOCATIONS).sort();
       stateEl.innerHTML = "<option value=''>State</option>";
-      states.forEach((state) => {
+      Object.keys(INDIA_LOCATIONS).sort().forEach((state) => {
         const opt = document.createElement("option");
         opt.value = state;
         opt.textContent = state;
@@ -293,8 +217,7 @@
 
     function fillCities(state) {
       cityEl.innerHTML = "<option value=''>City</option>";
-      const cities = INDIA_LOCATIONS[state] || [];
-      cities.forEach((city) => {
+      (INDIA_LOCATIONS[state] || []).forEach((city) => {
         const opt = document.createElement("option");
         opt.value = city;
         opt.textContent = city;
@@ -302,155 +225,170 @@
       });
     }
 
+    stateEl.addEventListener("change", () => fillCities(stateEl.value));
+
     async function getLocation(city, state, country) {
       const q = `${city}, ${state}, ${country}`;
       const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
       const res = await fetch(url, { headers: { "Accept": "application/json" } });
       const data = await res.json();
-      if (!Array.isArray(data) || !data.length) {
-        throw new Error("Could not find latitude/longitude for selected place.");
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("Could not resolve latitude and longitude for selected city.");
       }
-      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon)
+      };
     }
 
     function validateInput() {
-      const values = {
-        name: document.getElementById("name").value.trim(),
-        day: document.getElementById("day").value.trim(),
-        month: document.getElementById("month").value.trim(),
-        year: document.getElementById("year").value.trim(),
-        hour: document.getElementById("hour").value.trim(),
-        minute: document.getElementById("minute").value.trim(),
-        timezone: document.getElementById("timezone").value.trim(),
-        country: countryEl.value,
-        state: stateEl.value,
-        city: cityEl.value
-      };
+      const name = document.getElementById("name").value.trim();
+      const day = document.getElementById("day").value.trim();
+      const month = document.getElementById("month").value.trim();
+      const year = document.getElementById("year").value.trim();
+      const hour = document.getElementById("hour").value.trim();
+      const minute = document.getElementById("minute").value.trim();
+      const country = countryEl.value.trim();
+      const state = stateEl.value.trim();
+      const city = cityEl.value.trim();
 
-      if (!values.day || !values.month || !values.year || !values.hour || !values.minute || !values.state || !values.city) {
-        throw new Error("Please enter date, month, year, time, state, and city.");
+      if (!name || !day || !month || !year || !hour || !minute || !country || !state || !city) {
+        throw new Error("Please enter name, date, month, year, time, country, state, and city.");
       }
 
-      return values;
+      return {
+        name,
+        day: day.padStart(2, "0"),
+        month: month.padStart(2, "0"),
+        year,
+        hour: hour.padStart(2, "0"),
+        minute: minute.padStart(2, "0"),
+        country,
+        state,
+        city
+      };
     }
 
-    function setKv(targetId, pairs) {
-      const el = document.getElementById(targetId);
-      el.innerHTML = pairs.map(([k, v]) => `<div><strong>${k}</strong></div><div>${v ?? "-"}</div>`).join("");
-    }
-
-    function renderPlanetTable(grahaPositions) {
-      const order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    function renderPlanetTable(data) {
       const tbody = document.querySelector("#planetTable tbody");
-      tbody.innerHTML = order.map((planet) => {
-        const row = grahaPositions[planet];
-        return `<tr>
-          <td>${planet}</td>
-          <td>${row.sign}</td>
-          <td>${row.degree_in_sign.toFixed(2)}°</td>
-          <td>${row.nakshatra}</td>
-          <td>${row.nakshatra_lord}</td>
-        </tr>`;
-      }).join("");
-    }
+      const rows = [];
 
-    function renderDashaTable(mahadasha) {
-      const tbody = document.querySelector("#dashaTable tbody");
-      tbody.innerHTML = mahadasha.map((item) => `
+      rows.push({
+        planet: "Lagnam",
+        sign: data.lagna.sign,
+        degree: `${Number(data.lagna.degree_in_sign).toFixed(2)}°`,
+        nakshatra: "-",
+        lord: "-"
+      });
+
+      const order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+
+      order.forEach((p) => {
+        const g = data.graha_positions[p];
+        rows.push({
+          planet: p,
+          sign: g.sign,
+          degree: `${Number(g.degree_in_sign).toFixed(2)}°`,
+          nakshatra: g.nakshatra,
+          lord: g.nakshatra_lord
+        });
+      });
+
+      tbody.innerHTML = rows.map((r) => `
         <tr>
-          <td>${item.lord}</td>
-          <td>${item.start}</td>
-          <td>${item.end}</td>
+          <td>${r.planet}</td>
+          <td>${r.sign}</td>
+          <td>${r.degree}</td>
+          <td>${r.nakshatra}</td>
+          <td>${r.lord}</td>
         </tr>
       `).join("");
     }
 
-    function renderChart(targetId, chartData) {
-      const container = document.getElementById(targetId);
-      container.innerHTML = chartSequence.map((sign) => {
+    function renderSouthChart(data) {
+      const container = document.getElementById("rasiChart");
+      const chartData = data.rasi_chart;   // critical fix: use rasi_chart, not chart
+
+      container.innerHTML = "";
+
+      chartLayout.forEach((sign) => {
+        const cell = document.createElement("div");
+        cell.className = "chart-cell";
+
         if (!sign) {
-          return `<div class="cell empty"></div>`;
+          cell.style.background = "#fff";
+          container.appendChild(cell);
+          return;
         }
-        const occupants = (chartData[sign] || []).join("\n");
-        return `<div class="cell">
-          <div class="label">${sign}</div>
-          <div class="occupants">${occupants || "-"}</div>
-        </div>`;
-      }).join("");
+
+        const signLabel = document.createElement("div");
+        signLabel.className = "chart-sign";
+        signLabel.textContent = sign;
+
+        const text = document.createElement("div");
+        text.className = "chart-text";
+
+        const occupants = chartData[sign] || [];
+        text.textContent = occupants.length ? occupants.join(", ") : "";
+
+        cell.appendChild(signLabel);
+        cell.appendChild(text);
+        container.appendChild(cell);
+      });
+    }
+
+    function renderDasha(data) {
+      const bal = data.core_result.balance;
+      const cur = data.core_result.current_dasha;
+
+      document.getElementById("dashaBox").innerHTML = `
+        <div><b>bal. of dasa:</b> ${bal.years} years, ${bal.months} months, ${bal.days} days</div>
+        <div><b>present dasa running:</b> ${cur.lord} (${cur.start} to ${cur.end})</div>
+      `;
     }
 
     async function calculate() {
       errorBox.textContent = "";
-      reportEl.classList.add("hidden");
 
       try {
-        const values = validateInput();
-        const dob = `${values.year}-${pad2(values.month)}-${pad2(values.day)}`;
-        const tob = `${pad2(values.hour)}:${pad2(values.minute)}`;
-        const coords = await getLocation(values.city, values.state, values.country);
+        const input = validateInput();
+        const dob = `${input.year}-${input.month}-${input.day}`;
+        const tob = `${input.hour}:${input.minute}`;
 
-        const payload = {
-          name: values.name,
-          dob,
-          tob,
-          tz: parseFloat(values.timezone || "5.5"),
-          lat: coords.lat,
-          lon: coords.lon,
-          country: values.country,
-          state: values.state,
-          city: values.city
-        };
+        const location = await getLocation(input.city, input.state, input.country);
 
-        const response = await fetch(`${API}/calculate`, {
+        const res = await fetch("/calculate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            name: input.name,
+            dob,
+            tob,
+            tz: 5.5,
+            lat: location.lat,
+            lon: location.lon,
+            country: input.country,
+            state: input.state,
+            city: input.city
+          })
         });
 
-        if (!response.ok) {
-          throw new Error("Calculation failed. Please check backend/API.");
+        if (!res.ok) {
+          throw new Error("Calculation request failed.");
         }
 
-        const data = await response.json();
+        const data = await res.json();
 
-        setKv("birthDetails", [
-          ["Name", data.input.name || "-"],
-          ["Date of Birth", data.input.dob],
-          ["Time of Birth", data.input.tob],
-          ["Country", data.input.country],
-          ["State", data.input.state],
-          ["City", data.input.city]
-        ]);
+        renderPlanetTable(data);
+        renderSouthChart(data);
+        renderDasha(data);
 
-        setKv("dashaSummary", [
-          ["Moon Nakshatra", data.core_result.moon_nakshatra],
-          ["Dasha Balance", `${data.core_result.balance.years}Y ${data.core_result.balance.months}M ${data.core_result.balance.days}D`],
-          ["Current Dasha", data.core_result.current_dasha.lord],
-          ["Current From", data.core_result.current_dasha.start],
-          ["Current To", data.core_result.current_dasha.end]
-        ]);
-
-        setKv("lagnaSummary", [
-          ["Lagna Sign", data.lagna.sign],
-          ["Lagna Degree", `${data.lagna.degree_in_sign.toFixed(2)}°`],
-          ["Latitude", data.input.lat.toFixed(4)],
-          ["Longitude", data.input.lon.toFixed(4)],
-          ["Timezone", data.input.tz]
-        ]);
-
-        renderPlanetTable(data.graha_positions);
-        renderDashaTable(data.mahadasha);
-        renderChart("rasiChart", data.rasi_chart);
-        renderChart("navamsaChart", data.navamsa_chart);
-
-        reportEl.classList.remove("hidden");
       } catch (err) {
-        errorBox.textContent = err.message;
+        errorBox.textContent = err.message || "Unexpected error.";
       }
     }
 
-    stateEl.addEventListener("change", (e) => fillCities(e.target.value));
-    document.getElementById("showBtn").addEventListener("click", calculate);
+    showBtn.addEventListener("click", calculate);
 
     fillCountries();
     fillStates();

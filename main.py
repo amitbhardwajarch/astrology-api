@@ -1,7 +1,7 @@
 from datetime import datetime
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from dasha_engine import (
@@ -37,6 +37,16 @@ class BirthInput(BaseModel):
     country: str = "India"
     state: str = ""
     city: str = ""
+
+
+@app.get("/")
+def home():
+    return FileResponse("index.html")
+
+
+@app.get("/india_locations.js")
+def india_locations():
+    return FileResponse("india_locations.js", media_type="application/javascript")
 
 
 @app.get("/health")
