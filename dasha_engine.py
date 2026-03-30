@@ -55,6 +55,61 @@ DASHA_ORDER = [
     "Mercury",
 ]
 
+KP_LORD_SEQUENCE = DASHA_ORDER[:]  # same Vimshottari order
+TOTAL_DASHA_YEARS = 120.0
+NAKSHATRA_SPAN = 13.333333333333334  # 13°20'
+
+def get_kp_division_lord(offset_in_span: float, span_length: float, start_lord: str):
+    """
+    Given an offset inside a span and the starting Vimshottari lord,
+    return which lord owns that subdivision using proportional KP division.
+    """
+    start_index = KP_LORD_SEQUENCE.index(start_lord)
+    running = 0.0
+
+    for i in range(9):
+        lord = KP_LORD_SEQUENCE[(start_index + i) % 9]
+        lord_span = span_length * (DASHA_YEARS[lord] / TOTAL_DASHA_YEARS)
+        if running <= offset_in_span < running + lord_span:
+            return lord, running, lord_span
+        running += lord_span
+
+    # fallback for floating-point edge
+    lord = KP_LORD_SEQUENCE[(start_index + 8) % 9]
+    lord_span = span_length * (DASHA_YEARS[lord] / TOTAL_DASHA_YEARS)
+    return lord, running - lord_span, lord_span
+
+
+def get_kp_details(longitude: float):
+    """
+    Returns Nakshatra, Nakshatra Lord, Sub-Lord, and Sub-Sub-Lord
+    for a given longitude using KP-style Vimshottari subdivision.
+    """
+    nakshatra, nak_lord = get_nakshatra_info(longitude)
+
+    position_in_nak = longitude % NAKSHATRA_SPAN
+
+    sub_lord, sub_start, sub_span = get_kp_division_lord(
+        position_in_nak,
+        NAKSHATRA_SPAN,
+        nak_lord
+    )
+
+    position_in_sub = position_in_nak - sub_start
+
+    sub_sub_lord, _, _ = get_kp_division_lord(
+        position_in_sub,
+        sub_span,
+        sub_lord
+    )
+
+    return {
+        "nakshatra": nakshatra,
+        "nakshatra_lord": nak_lord,
+        "sub_lord": sub_lord,
+        "sub_sub_lord": sub_sub_lord,
+    }
+
 RASHIS = [
     "Aries",
     "Taurus",
@@ -155,10 +210,16 @@ def calculate_lagna(jd: float, lat: float, lon: float):
     houses = swe.houses_ex(jd, lat, lon, b"P", swe.FLG_SIDEREAL)
     asc = houses[0][0]
     sign, deg = zodiac_from_longitude(asc)
+    kp = get_kp_details(asc)
+
     return {
         "longitude": round(asc, 6),
         "sign": sign,
         "degree_in_sign": deg,
+        "nakshatra": kp["nakshatra"],
+        "nakshatra_lord": kp["nakshatra_lord"],
+        "sub_lord": kp["sub_lord"],
+        "sub_sub_lord": kp["sub_sub_lord"],
     }
 
 

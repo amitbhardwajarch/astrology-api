@@ -97,6 +97,12 @@ def calculate(data: BirthInput):
             },
         },
         "lagna": lagna,
+        "ascendant_details": {
+        "nakshatra": lagna["nakshatra"],
+        "nakshatra_lord": lagna["nakshatra_lord"],
+        "sub_lord": lagna["sub_lord"],
+        "sub_sub_lord": lagna["sub_sub_lord"],
+        },
         "graha_positions": graha_positions,
         "rasi_chart": rasi_chart,
         "navamsa_chart": navamsa_chart,

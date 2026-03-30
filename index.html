@@ -178,10 +178,14 @@
       </div>
     </div>
 
-    <div class="footer-box" id="dashaBox">
-      <div><b>bal. of dasa:</b></div>
-      <div><b>present dasa running:</b></div>
-    </div>
+   <div class="footer-box" id="dashaBox">
+     <div><b>bal. of dasa:</b></div>
+     <div><b>present dasa running:</b></div>
+     <div><b>ascendant nakshatra:</b></div>
+     <div><b>ascendant nakshatra lord:</b></div>
+     <div><b>ascendant sub-lord:</b></div>
+     <div><b>ascendant sub-sub-lord:</b></div>
+   </div>
 
     <div id="errorBox" class="error"></div>
   </div>
@@ -388,12 +392,17 @@
     function renderDasha(data) {
       const bal = data.core_result.balance;
       const cur = data.core_result.current_dasha;
+      const asc = data.ascendant_details;
 
-      document.getElementById("dashaBox").innerHTML = `
-        <div><b>bal. of dasa:</b> ${bal.years} years, ${bal.months} months, ${bal.days} days</div>
-        <div><b>present dasa running:</b> ${cur.lord} (${cur.start} to ${cur.end})</div>
-      `;
-    }
+    document.getElementById("dashaBox").innerHTML = `
+      <div><b>bal. of dasa:</b> ${bal.years} years, ${bal.months} months, ${bal.days} days</div>
+      <div><b>present dasa running:</b> ${cur.lord} (${cur.start} to ${cur.end})</div>
+      <div><b>ascendant nakshatra:</b> ${asc.nakshatra}</div>
+      <div><b>ascendant nakshatra lord:</b> ${asc.nakshatra_lord}</div>
+      <div><b>ascendant sub-lord:</b> ${asc.sub_lord}</div>
+      <div><b>ascendant sub-sub-lord:</b> ${asc.sub_sub_lord}</div>
+     `;
+   }
 
     async function calculate() {
       errorBox.textContent = "";
