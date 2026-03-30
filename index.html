@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ASTROGURUJI</title>
+  <title>ASTROGURUJI - FINAL</title>
   <style>
     body {
       margin: 0;
@@ -40,8 +40,8 @@
       border: 1px solid #111;
       padding: 4px 8px;
       font-size: 14px;
-      text-transform: uppercase;
       background: #fff;
+      text-transform: uppercase;
     }
 
     .input-row button {
@@ -75,11 +75,11 @@
     .chart-cell {
       border: 1px solid #111;
       padding: 6px;
-      font-size: 14px;
-      line-height: 1.25;
       position: relative;
       white-space: pre-line;
       overflow: hidden;
+      font-size: 14px;
+      line-height: 1.25;
     }
 
     .chart-cell.empty {
@@ -89,7 +89,6 @@
     .chart-sign {
       font-size: 13px;
       font-weight: 700;
-      color: #111;
       position: absolute;
       top: 4px;
       left: 6px;
@@ -98,12 +97,10 @@
     .chart-text {
       margin-top: 30px;
       font-weight: 700;
-      font-size: 14px;
     }
 
     .planet-box {
       border: 2px solid #111;
-      padding: 0;
     }
 
     table {
@@ -114,35 +111,35 @@
 
     th, td {
       border: 1px solid #111;
-      padding: 8px 8px;
-      font-size: 14px;
+      padding: 6px;
+      font-size: 13px;
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      background: #f3f3f3;
-      font-weight: 700;
+      background: #eee;
     }
 
     .footer-box {
       border: 2px solid #111;
       margin-top: 14px;
-      padding: 10px 12px;
-      font-size: 16px;
+      padding: 10px;
+      font-size: 14px;
       line-height: 1.8;
       min-height: 74px;
     }
 
     .error {
       margin-top: 10px;
-      color: #b00020;
+      color: red;
       font-weight: 700;
     }
   </style>
 </head>
 <body>
   <div class="page">
+
     <div class="title">ASTROGURUJI</div>
 
     <div class="input-row">
@@ -166,11 +163,11 @@
         <table id="planetTable">
           <thead>
             <tr>
-              <th style="width: 22%;">Planet</th>
-              <th style="width: 18%;">Sign</th>
-              <th style="width: 18%;">Degree</th>
-              <th style="width: 24%;">Nakshatra</th>
-              <th style="width: 18%;">Lord</th>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>Nakshatra</th>
+              <th>Lord</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -178,31 +175,21 @@
       </div>
     </div>
 
-   <div class="footer-box" id="dashaBox">
-     <div><b>bal. of dasa:</b></div>
-     <div><b>present dasa running:</b></div>
-     <div><b>ascendant nakshatra:</b></div>
-     <div><b>ascendant nakshatra lord:</b></div>
-     <div><b>ascendant sub-lord:</b></div>
-     <div><b>ascendant sub-sub-lord:</b></div>
-   </div>
+    <div class="footer-box" id="dashaBox">
+      <b>Bal of Dasa:</b> -<br>
+      <b>Present Dasa:</b> -<br>
+      <b>Asc Nakshatra:</b> -<br>
+      <b>Nakshatra Lord:</b> -<br>
+      <b>Sub Lord:</b> -<br>
+      <b>Sub Sub Lord:</b> -
+    </div>
 
     <div id="errorBox" class="error"></div>
+
   </div>
 
   <script src="/india_locations.js"></script>
   <script>
-    const countryEl = document.getElementById("country");
-    const stateEl = document.getElementById("state");
-    const cityEl = document.getElementById("city");
-    const showBtn = document.getElementById("showBtn");
-    const errorBox = document.getElementById("errorBox");
-
-    // Required South Indian zodiac layout:
-    // Top row: 12 | 1 | 2 | 3
-    // Left side: 11, 10
-    // Right side: 4, 5
-    // Bottom row: 9 | 8 | 7 | 6
     const chartLayout = [
       "Pisces", "Aries", "Taurus", "Gemini",
       "Aquarius", null, null, "Cancer",
@@ -211,85 +198,51 @@
     ];
 
     const signNumbers = {
-      "Aries": 1,
-      "Taurus": 2,
-      "Gemini": 3,
-      "Cancer": 4,
-      "Leo": 5,
-      "Virgo": 6,
-      "Libra": 7,
-      "Scorpio": 8,
-      "Sagittarius": 9,
-      "Capricorn": 10,
-      "Aquarius": 11,
-      "Pisces": 12
+      Aries: 1,
+      Taurus: 2,
+      Gemini: 3,
+      Cancer: 4,
+      Leo: 5,
+      Virgo: 6,
+      Libra: 7,
+      Scorpio: 8,
+      Sagittarius: 9,
+      Capricorn: 10,
+      Aquarius: 11,
+      Pisces: 12
     };
 
-    function fillCountries() {
-      countryEl.innerHTML = "";
-      const opt = document.createElement("option");
-      opt.value = "India";
-      opt.textContent = "India";
-      countryEl.appendChild(opt);
-    }
+    const countryEl = document.getElementById("country");
+    const stateEl = document.getElementById("state");
+    const cityEl = document.getElementById("city");
+    const showBtn = document.getElementById("showBtn");
+    const errorBox = document.getElementById("errorBox");
 
-    function fillStates() {
-      stateEl.innerHTML = "<option value=''>State</option>";
+    function initDropdowns() {
+      countryEl.innerHTML = "<option value='India'>India</option>";
+
+      stateEl.innerHTML = "<option value=''>Select State</option>";
       Object.keys(INDIA_LOCATIONS).sort().forEach((state) => {
-        const opt = document.createElement("option");
-        opt.value = state;
-        opt.textContent = state;
-        stateEl.appendChild(opt);
+        stateEl.innerHTML += `<option value="${state}">${state}</option>`;
       });
-    }
 
-    function fillCities(state) {
-      cityEl.innerHTML = "<option value=''>City</option>";
-      (INDIA_LOCATIONS[state] || []).forEach((city) => {
-        const opt = document.createElement("option");
-        opt.value = city;
-        opt.textContent = city;
-        cityEl.appendChild(opt);
-      });
-    }
+      cityEl.innerHTML = "<option value=''>Select City</option>";
 
-    function initializeDefaults() {
-      fillCountries();
-      fillStates();
+      stateEl.onchange = () => {
+        cityEl.innerHTML = "<option value=''>Select City</option>";
+        const cities = INDIA_LOCATIONS[stateEl.value] || [];
+        cities.forEach((city) => {
+          cityEl.innerHTML += `<option value="${city}">${city}</option>`;
+        });
+      };
 
-      // Auto-select first actual state
       if (stateEl.options.length > 1) {
         stateEl.selectedIndex = 1;
-        fillCities(stateEl.value);
-
-        // Auto-select first actual city
+        stateEl.onchange();
         if (cityEl.options.length > 1) {
           cityEl.selectedIndex = 1;
         }
       }
-    }
-
-    stateEl.addEventListener("change", () => {
-      fillCities(stateEl.value);
-      if (cityEl.options.length > 1) {
-        cityEl.selectedIndex = 1;
-      }
-    });
-
-    async function getLocation(city, state, country) {
-      const q = `${city}, ${state}, ${country}`;
-      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
-      const res = await fetch(url, { headers: { "Accept": "application/json" } });
-      const data = await res.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
-        throw new Error("Could not resolve latitude and longitude for selected city.");
-      }
-
-      return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
-      };
     }
 
     function validateInput() {
@@ -318,49 +271,26 @@
       };
     }
 
-    function renderPlanetTable(data) {
-      const tbody = document.querySelector("#planetTable tbody");
-      const rows = [];
-
-      rows.push({
-        planet: "Lagnam",
-        sign: data.lagna.sign,
-        degree: `${Number(data.lagna.degree_in_sign).toFixed(2)}°`,
-        nakshatra: "-",
-        lord: "-"
+    async function getLocation(city, state, country) {
+      const query = `${city}, ${state}, ${country}`;
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+      const res = await fetch(url, {
+        headers: { "Accept": "application/json" }
       });
+      const data = await res.json();
 
-      const order = [
-        "Sun", "Moon", "Mars", "Mercury",
-        "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"
-      ];
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("Could not resolve latitude and longitude for selected city.");
+      }
 
-      order.forEach((p) => {
-        const g = data.graha_positions[p];
-        rows.push({
-          planet: p,
-          sign: g.sign,
-          degree: `${Number(g.degree_in_sign).toFixed(2)}°`,
-          nakshatra: g.nakshatra,
-          lord: g.nakshatra_lord
-        });
-      });
-
-      tbody.innerHTML = rows.map((r) => `
-        <tr>
-          <td>${r.planet}</td>
-          <td>${r.sign}</td>
-          <td>${r.degree}</td>
-          <td>${r.nakshatra}</td>
-          <td>${r.lord}</td>
-        </tr>
-      `).join("");
+      return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon)
+      };
     }
 
-    function renderSouthChart(data) {
+    function renderChart(data) {
       const container = document.getElementById("rasiChart");
-      const chartData = data.rasi_chart;
-
       container.innerHTML = "";
 
       chartLayout.forEach((sign) => {
@@ -373,39 +303,62 @@
           return;
         }
 
-        const signLabel = document.createElement("div");
-        signLabel.className = "chart-sign";
-        signLabel.textContent = `${signNumbers[sign]}. ${sign}`;
-
-        const text = document.createElement("div");
-        text.className = "chart-text";
-
-        const occupants = chartData[sign] || [];
-        text.textContent = occupants.length ? occupants.join(", ") : "";
-
-        cell.appendChild(signLabel);
-        cell.appendChild(text);
+        const occupants = (data.rasi_chart && data.rasi_chart[sign]) ? data.rasi_chart[sign] : [];
+        cell.innerHTML = `
+          <div class="chart-sign">${signNumbers[sign]} ${sign}</div>
+          <div class="chart-text">${occupants.join(", ")}</div>
+        `;
         container.appendChild(cell);
       });
     }
 
-    function renderDasha(data) {
-      const bal = data.core_result.balance;
-      const cur = data.core_result.current_dasha;
-      const asc = data.ascendant_details;
+    function renderTable(data) {
+      const tbody = document.querySelector("#planetTable tbody");
+      tbody.innerHTML = "";
 
-    document.getElementById("dashaBox").innerHTML = `
-      <div><b>bal. of dasa:</b> ${bal.years} years, ${bal.months} months, ${bal.days} days</div>
-      <div><b>present dasa running:</b> ${cur.lord} (${cur.start} to ${cur.end})</div>
-      <div><b>ascendant nakshatra:</b> ${asc.nakshatra}</div>
-      <div><b>ascendant nakshatra lord:</b> ${asc.nakshatra_lord}</div>
-      <div><b>ascendant sub-lord:</b> ${asc.sub_lord}</div>
-      <div><b>ascendant sub-sub-lord:</b> ${asc.sub_sub_lord}</div>
-     `;
-   }
+      const addRow = (planet, details) => {
+        const degree = typeof details.degree_in_sign === "number"
+          ? details.degree_in_sign.toFixed(2)
+          : "-";
+
+        const sign = details.sign || "-";
+        const nakshatra = details.nakshatra || "-";
+        const lord = details.nakshatra_lord || "-";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${planet}</td>
+            <td>${sign}</td>
+            <td>${degree}</td>
+            <td>${nakshatra}</td>
+            <td>${lord}</td>
+          </tr>
+        `;
+      };
+
+      addRow("Lagna", data.lagna || {});
+
+      ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]
+        .forEach((planet) => addRow(planet, (data.graha_positions && data.graha_positions[planet]) || {}));
+    }
+
+    function renderDasha(data) {
+      const bal = (data.core_result && data.core_result.balance) || {};
+      const cur = (data.core_result && data.core_result.current_dasha) || {};
+      const asc = data.ascendant_details || {};
+
+      document.getElementById("dashaBox").innerHTML = `
+        <b>Bal of Dasa:</b> ${bal.years ?? "-"}y ${bal.months ?? "-"}m ${bal.days ?? "-"}d<br>
+        <b>Present Dasa:</b> ${cur.lord ?? "-"} (${cur.start ?? "-"} to ${cur.end ?? "-"})<br>
+        <b>Asc Nakshatra:</b> ${asc.nakshatra ?? "-"}<br>
+        <b>Nakshatra Lord:</b> ${asc.nakshatra_lord ?? "-"}<br>
+        <b>Sub Lord:</b> ${asc.sub_lord ?? "-"}<br>
+        <b>Sub Sub Lord:</b> ${asc.sub_sub_lord ?? "-"}
+      `;
+    }
 
     async function calculate() {
-      errorBox.textContent = "";
+      errorBox.innerText = "";
 
       try {
         const input = validateInput();
@@ -418,8 +371,8 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            dob,
-            tob,
+            dob: dob,
+            tob: tob,
             tz: 5.5,
             lat: location.lat,
             lon: location.lon,
@@ -434,19 +387,20 @@
         }
 
         const data = await res.json();
+        console.log("API RESPONSE:", data);
 
-        renderPlanetTable(data);
-        renderSouthChart(data);
+        renderChart(data);
+        renderTable(data);
         renderDasha(data);
 
-      } catch (err) {
-        errorBox.textContent = err.message || "Unexpected error.";
+      } catch (e) {
+        errorBox.innerText = e.message || "Unexpected error";
       }
     }
 
-    showBtn.addEventListener("click", calculate);
+    showBtn.onclick = calculate;
 
-    initializeDefaults();
+    initDropdowns();
   </script>
 </body>
 </html>
